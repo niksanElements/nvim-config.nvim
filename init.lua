@@ -68,7 +68,12 @@ vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
 -- Preview substitutions live, as you type!
 vim.o.inccommand = 'split'
-
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'qf',
+  callback = function()
+    vim.keymap.set('n', '<Tab>', '<CR><C-w>p', { buffer = true })
+  end,
+})
 -- tab settings
 vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
