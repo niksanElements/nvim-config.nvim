@@ -99,5 +99,100 @@ return { -- Fuzzy Finder (files, lsp, etc)
     vim.keymap.set('n', '<leader>sn', function()
       builtin.find_files { cwd = vim.fn.stdpath 'config' }
     end, { desc = '[S]earch [N]eovim files' })
+
+    function TelescopeFileRefsBuffer()
+      local pickers = require 'telescope.pickers'
+      local finders = require 'telescope.finders'
+      local conf = require('telescope.config').values
+      local actions = require 'telescope.actions'
+      local action_state = require 'telescope.actions.state'
+      local make_entry = require 'telescope.make_entry'
+
+      local seen = {}
+      local results = {}
+
+      local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+      for _, line in ipairs(lines) do
+        local file, l, col = line:match '([^:%s]+):(%d+):(%d+)'
+        if file then
+          local key = file .. ':' .. l .. ':' .. col
+          if not seen[key] then
+            seen[key] = true
+
+            local cwd = vim.loop.cwd()
+
+            local display = line
+
+            if string.find(line, cwd, 0, true) then
+              display = '.' .. line:sub(#cwd + 1)
+            end
+
+            table.insert(results, {
+              value = line, -- full line (for jumping)
+              display = display, -- short version (for UI) -- ordinal controls sorting/search text
+              ordinal = line,
+            })
+          end
+        end
+      end
+
+      pickers
+        .new({}, {
+          prompt_title = 'Buffer File References',
+          finder = finders.new_table {
+            results = results,
+            entry_maker = function(entry)
+              return {
+                value = entry.value,
+                display = entry.display,
+                ordinal = entry.ordinal,
+              }
+            end,
+          },
+          previewer = conf.grep_previewer {},
+          sorter = conf.generic_sorter {},
+
+          attach_mappings = function(prompt_bufnr)
+            actions.select_default:replace(function()
+              local entry = action_state.get_selected_entry()
+              actions.close(prompt_bufnr)
+
+              local text = entry.value
+              local file, l, col = text:match '([^:%s]+):(%d+):(%d+)'
+
+              if file then
+                vim.cmd('edit ' .. file)
+                vim.api.nvim_win_set_cursor(0, { tonumber(l), tonumber(col) - 1 })
+              end
+            end)
+            return true
+          end,
+        })
+        :find()
+    end
+
+    vim.keymap.set('n', '<leader>es', TelescopeFileRefsBuffer, { desc = 'search error' })
+
+    function JumpUnderCursor()
+      -- If in terminal, go to normal mode
+      if vim.bo.buftype == 'terminal' then
+        vim.cmd 'stopinsert'
+      end
+
+      local line = vim.api.nvim_get_current_line()
+
+      local file, l, col = line:match '([^:%s]+):(%d+):(%d+)'
+      if not file then
+        print 'No file reference found'
+        return
+      end
+
+      vim.cmd('edit ' .. file)
+      vim.api.nvim_win_set_cursor(0, { tonumber(l), tonumber(col) - 1 })
+    end
+
+    -- normal buffers
+    vim.keymap.set('n', '<leader>ej', JumpUnderCursor, { desc = 'jump' })
   end,
 }
