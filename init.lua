@@ -7,6 +7,9 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = false
 
+-- doxygen
+vim.g.load_doxygen_syntax = true
+
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
@@ -75,9 +78,25 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 -- tab settings
+vim.opt.expandtab = true
 vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
 vim.opt.shiftwidth = 4
+
+-- enable spell check language
+vim.keymap.set('n', '<leader>ts', function()
+  -- Read current state, fallback to false if nil
+  local current_state = vim.opt_local.spell:get()
+
+  if not current_state then
+    vim.opt_local.spelllang = 'en_us'
+    vim.opt_local.spell = true
+    print 'Spell check: ENABLED (en_us)'
+  else
+    vim.opt_local.spell = false
+    print 'Spell check: DISABLED'
+  end
+end, { desc = '[S]pell check' })
 
 -- Show which line your cursor is on
 vim.o.cursorline = true
