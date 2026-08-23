@@ -151,6 +151,10 @@ vim.keymap.set('n', '<C-s>', '<Cmd>w<CR>', { desc = 'Save the current buffer' })
 vim.keymap.set('n', '<leader>i', '<C-i>', { desc = 'forward' })
 vim.keymap.set('n', '<leader>o', '<C-o>', { desc = 'backward' })
 
+-- keymap for moving a line up and down
+vim.keymap.set('n', '<leader>n', '<Cmd>m +1<CR>', {desc = 'Move the line +1'})
+vim.keymap.set('n', '<leader>p', '<Cmd>m -2<CR>', {desc = 'Move the line -1'})
+
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
 -- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
