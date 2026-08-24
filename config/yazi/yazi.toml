@@ -1,0 +1,4 @@
+[opener]
+edit = [
+	{ run = 'nvim "$@"', desc = "Edit with nvim", block = true, for = "unix" },
+]
