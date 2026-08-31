@@ -8,7 +8,7 @@ vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = false
 
 -- doxygen
-vim.g.load_doxygen_syntax = true
+vim.g.load_doxygen_syntax = false
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
