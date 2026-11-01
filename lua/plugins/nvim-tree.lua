@@ -1,6 +1,7 @@
 return {
   'nvim-tree/nvim-tree.lua',
   config = function()
+    vim.keymap.set('n', '<leader>td', '<cmd>NvimTreeToggle<cr>', { desc = 'nvim-tree'})
     local function my_on_attach(bufnr)
       local api = require 'nvim-tree.api'
 
